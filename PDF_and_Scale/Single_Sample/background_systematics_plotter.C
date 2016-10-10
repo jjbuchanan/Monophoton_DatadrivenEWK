@@ -22,18 +22,26 @@ using namespace std;
 
 void plot(string filename, Float_t nevents, Float_t xsec)
 {
-  // Change these values as needed
+  // Adjust these as needed
   Float_t int_lumi = 12900.0;
   TString xaxis_title = TString("Photon #it{p}_{T} [GeV]");
   TString yaxis_title = TString("Events / bin");
   const int nBins = 5;
   const int nPDFreplicas = 100;
 
-  TString histname_facUp = TString("Photon_Et_range_102");
-  TString histname_facDown = TString("Photon_Et_range_103");
-  TString histname_renUp = TString("Photon_Et_range_104");
-  TString histname_renDown = TString("Photon_Et_range_107");
+  // The names of the final histograms as they should appear in the data card
+  TString outputName_facUp = TString("h_"+filename+"_facUp");
+  TString outputName_facDown = TString("h_"+filename+"_facDown");
+  TString outputName_renUp = TString("h_"+filename+"_renUp");
+  TString outputName_renDown = TString("h_"+filename+"_renDown");
+  TString outputName_pdfUp = TString("h_"+filename+"_pdfUp");
+  TString outputName_pdfDown = TString("h_"+filename+"_pdfDown");
 
+  // The names of the histograms produced by the postAnalyzers
+  TString inputName_facUp = TString("Photon_Et_range_102");
+  TString inputName_facDown = TString("Photon_Et_range_103");
+  TString inputName_renUp = TString("Photon_Et_range_104");
+  TString inputName_renDown = TString("Photon_Et_range_107");
   std::vector<TString> histnames_pdf;
   histnames_pdf.clear();
   for(int i = 0; i < nPDFreplicas+1; i++)
@@ -49,26 +57,26 @@ void plot(string filename, Float_t nevents, Float_t xsec)
 
   // Scale variations
   
-  TH1F* histo_facUp = (TH1F*)((TH1F*)inputfile->Get(histname_facUp))->Clone(TString("h_"+filename+"_facUp"));
+  TH1F* histo_facUp = (TH1F*)((TH1F*)inputfile->Get(inputName_facUp))->Clone(outputName_facUp);
   histo_facUp->SetStats(0);
   histo_facUp->Scale(xsec*int_lumi/nevents);
   histo_facUp->SetTitle("");
   histo_facUp->GetXaxis()->SetTitle(xaxis_title);
   histo_facUp->GetYaxis()->SetTitle(yaxis_title);
-  TH1F* histo_facDown = (TH1F*)((TH1F*)inputfile->Get(histname_facDown))->Clone(TString("h_"+filename+"_facDown"));
+  TH1F* histo_facDown = (TH1F*)((TH1F*)inputfile->Get(inputName_facDown))->Clone(outputName_facDown);
   histo_facDown->SetStats(0);
   histo_facDown->Scale(xsec*int_lumi/nevents);
   histo_facDown->SetTitle("");
   histo_facDown->GetXaxis()->SetTitle(xaxis_title);
   histo_facDown->GetYaxis()->SetTitle(yaxis_title);
   
-  TH1F* histo_renUp = (TH1F*)((TH1F*)inputfile->Get(histname_renUp))->Clone(TString("h_"+filename+"_renUp"));
+  TH1F* histo_renUp = (TH1F*)((TH1F*)inputfile->Get(inputName_renUp))->Clone(outputName_renUp);
   histo_renUp->SetStats(0);
   histo_renUp->Scale(xsec*int_lumi/nevents);
   histo_renUp->SetTitle("");
   histo_renUp->GetXaxis()->SetTitle(xaxis_title);
   histo_renUp->GetYaxis()->SetTitle(yaxis_title);
-  TH1F* histo_renDown = (TH1F*)((TH1F*)inputfile->Get(histname_renDown))->Clone(TString("h_"+filename+"_renDown"));
+  TH1F* histo_renDown = (TH1F*)((TH1F*)inputfile->Get(inputName_renDown))->Clone(outputName_renDown);
   histo_renDown->SetStats(0);
   histo_renDown->Scale(xsec*int_lumi/nevents);
   histo_renDown->SetTitle("");
@@ -136,7 +144,7 @@ void plot(string filename, Float_t nevents, Float_t xsec)
   Float_t rms_error_bin4 = sqrt(sum_of_squared_residuals_bin4/(nPDFreplicas-1));
   Float_t rms_error_bin5 = sqrt(sum_of_squared_residuals_bin5/(nPDFreplicas-1));
   
-  TH1F* histo_pdfUp = (TH1F*)((TH1F*)inputfile->Get(histnames_pdf[0]))->Clone(TString("h_"+filename+"_pdfUp"));
+  TH1F* histo_pdfUp = (TH1F*)((TH1F*)inputfile->Get(histnames_pdf[0]))->Clone(outputName_pdfUp);
   histo_pdfUp->SetBinContent(1,histo_pdfUp->GetBinContent(1) + rms_error_bin1);
   histo_pdfUp->SetBinContent(2,histo_pdfUp->GetBinContent(2) + rms_error_bin2);
   histo_pdfUp->SetBinContent(3,histo_pdfUp->GetBinContent(3) + rms_error_bin3);
@@ -147,7 +155,7 @@ void plot(string filename, Float_t nevents, Float_t xsec)
   histo_pdfUp->SetTitle("");
   histo_pdfUp->GetXaxis()->SetTitle(xaxis_title);
   histo_pdfUp->GetYaxis()->SetTitle(yaxis_title);
-  TH1F* histo_pdfDown = (TH1F*)((TH1F*)inputfile->Get(histnames_pdf[0]))->Clone(TString("h_"+filename+"_pdfDown"));
+  TH1F* histo_pdfDown = (TH1F*)((TH1F*)inputfile->Get(histnames_pdf[0]))->Clone(outputName_pdfDown);
   histo_pdfDown->SetBinContent(1,TMath::Max(histo_pdfDown->GetBinContent(1) - rms_error_bin1,0.0));
   histo_pdfDown->SetBinContent(2,TMath::Max(histo_pdfDown->GetBinContent(2) - rms_error_bin2,0.0));
   histo_pdfDown->SetBinContent(3,TMath::Max(histo_pdfDown->GetBinContent(3) - rms_error_bin3,0.0));
@@ -160,9 +168,6 @@ void plot(string filename, Float_t nevents, Float_t xsec)
   histo_pdfDown->GetYaxis()->SetTitle(yaxis_title);
   
   // Set zero bins to a small value to avoid fitting issues
-  // Different values (0.97e-6, 1.03e-6) are meant to preserve the fact that pdfUp and pdfDown refer
-  // to up and down shifts in the cross section itself, and that fac/ren up & down refer to shifts in the
-  // QCD scales (resulting in oppositely-directed shifts in the cross section).
   for(int i = 1; i <= nBins; i++)
   {
     if(histo_facUp->GetBinContent(i) == 0.0)
