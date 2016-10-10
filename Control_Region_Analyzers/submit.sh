@@ -1,3 +1,4 @@
+# Compile
 ./rootcom postAnalyzer_ZnnG_mc_znng ZnnG_mc_znng
 ./rootcom postAnalyzer_ZnnG_mc_wg ZnnG_mc_wg
 ./rootcom postAnalyzer_ZnnG_mc ZnnG_mc
@@ -27,7 +28,8 @@
 ./rootcom postAnalyzer_WmnG_qcd WmnG_qcd
 
 
-
+# Run
+# ewk_corr.root does not play nicely with condor, so run anything that needs it locally
 ./MakeCondorFiles.csh ZnnG_data /hdfs/store/user/gomber/SinglePhoton_2016B/SinglePhoton/crab_job_SinglePhoton2016B_13TeV_2016_12p9fb_allvar_newbh_1/160720_172204/0000/  ZnnG_data0000b.root -1 1000 ZnnG_data0000b
 ./MakeCondorFiles.csh ZnnG_data /hdfs/store/user/gomber/SinglePhoton_2016B/SinglePhoton/crab_job_SinglePhoton2016B_13TeV_2016_12p9fb_allvar_newbh_1/160720_172204/0001/  ZnnG_data0001b.root -1 1000 ZnnG_data0001b
 ./MakeCondorFiles.csh ZnnG_data /hdfs/store/user/gomber/SinglePhoton_2016B/SinglePhoton/crab_job_SinglePhoton2016B_13TeV_2016_12p9fb_allvar_newbh_1/160720_172204/0002/  ZnnG_data0002b.root -1 1000 ZnnG_data0002b
@@ -184,7 +186,7 @@ nohup ./WmnG_mc_znng /hdfs/store/user/jjbuch/ntuples80X/MiniAODv2_CustomVariable
 ./MakeCondorFiles.csh WmnG_mc /hdfs/store/user/jjbuch/ntuples80X/MiniAODv2_CustomVariables/DiPhotonJets_MGG-80toInf_13TeV_amcatnloFXFX_pythia8/crab_DiPhotonJets_MGG-80toInf_amcatnlo/160825_000327/0000/  WmnG_DiPhoton.root -1 1000 WmnG_DiPhoton
 
 
-
+# Consolidate output files
 hadd -f ZnnG_data_all.root ZnnG_data000**.root
 hadd -f ZllG_data_all.root ZllG_data000**.root
 hadd -f WenG_data_all.root WenG_data000**.root
@@ -198,3 +200,11 @@ hadd -f WmnG_wenu_all.root WmnG_wenu000**.root
 hadd -f ZnnG_qcd_all.root ZnnG_qcd000**.root
 hadd -f WenG_qcd_all.root WenG_qcd000**.root
 hadd -f WmnG_qcd_all.root WmnG_qcd000**.root
+
+# Make fancy plots
+root -l -q -b wmng_transfer_factor_plotter.C
+root -l -q -b znng_transfer_factor_plotter.C
+root -l -q -b znng_plotter.C
+root -l -q -b zllg_plotter.C
+root -l -q -b weng_plotter.C
+root -l -q -b wmng_plotter.C
